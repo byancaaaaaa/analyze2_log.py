@@ -25,18 +25,26 @@ with open("sample-log.txt", "r") as file:
 
 print("Tentativas de login com falha (análise por janela de tempo):")
 
+reported = set()
+
 for i in range(len(failed_events)):
     count = 1
     start_time = failed_events[i]["time"]
+    user = failed_events[i]["user"]
+    ip = failed_events[i]["ip"]
+
+    key = (user, ip)
+
+    if key in reported:
+        continue
 
     for j in range(i + 1, len(failed_events)):
         if failed_events[j]["time"] - start_time <= TIME_WINDOW:
-            if (failed_events[j]["user"] == failed_events[i]["user"] and
-                failed_events[j]["ip"] == failed_events[i]["ip"]):
+            if (failed_events[j]["user"] == user and
+                failed_events[j]["ip"] == ip):
                 count += 1
 
     if count >= 3:
-        print(f"Usuário: {failed_events[i]['user']} | "
-              f"IP: {failed_events[i]['ip']} | "
-              f"Falhas em 5 min: {count}")
+        print(f"Usuário: {user} | IP: {ip} | Falhas em 5 min: {count}")
         print("⚠ Risco elevado: possível ataque de força bruta\n")
+        reported.add(key)
