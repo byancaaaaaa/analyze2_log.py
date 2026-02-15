@@ -23,9 +23,7 @@ with open("sample-log.txt", "r") as file:
                 "ip": ip
             })
 
-print("Tentativas de login com falha (análise por janela de tempo):")
-
-reported = set()
+max_failures = {}
 
 print("Tentativas de login com falha (análise por janela de tempo):")
 
@@ -37,16 +35,15 @@ for i in range(len(failed_events)):
 
     key = (user, ip)
 
-    if key in reported:
-        continue
-
     for j in range(i + 1, len(failed_events)):
         if failed_events[j]["time"] - start_time <= TIME_WINDOW:
             if (failed_events[j]["user"] == user and
                 failed_events[j]["ip"] == ip):
                 count += 1
 
+    max_failures[key] = max(max_failures.get(key, 0), count)
+
+for (user, ip), count in max_failures.items():
     if count >= 3:
         print(f"Usuário: {user} | IP: {ip} | Falhas em 5 min: {count}")
         print("⚠ Risco elevado: possível ataque de força bruta\n")
-        reported.add(key)
