@@ -27,6 +27,8 @@ print("Tentativas de login com falha (análise por janela de tempo):")
 
 reported = set()
 
+print("Tentativas de login com falha (análise por janela de tempo):")
+
 for i in range(len(failed_events)):
     count = 1
     start_time = failed_events[i]["time"]
